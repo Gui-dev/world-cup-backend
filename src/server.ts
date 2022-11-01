@@ -6,6 +6,10 @@ const bootstrap = async () => {
     logger: true
   })
 
+  fastify.get('/pools/count', () => {
+    return { count: 32718743321321 }
+  })
+
   await fastify.listen({
     port: PORT
   })
