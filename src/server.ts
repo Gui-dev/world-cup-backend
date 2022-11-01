@@ -1,4 +1,7 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors'
+
+import { prisma } from './services/prisma'
 
 const bootstrap = async () => {
   const PORT = 3333 || process.env.PORT
@@ -6,12 +9,19 @@ const bootstrap = async () => {
     logger: true
   })
 
-  fastify.get('/pools/count', () => {
-    return { count: 32718743321321 }
+  await fastify.register(cors, {
+    origin: true
+  })
+
+  fastify.get('/pools/count', async (req, res) => {
+    const count = await prisma.pool.count()
+
+    return { count }
   })
 
   await fastify.listen({
-    port: PORT
+    port: PORT,
+    host: '0.0.0.0'
   })
 }
 
