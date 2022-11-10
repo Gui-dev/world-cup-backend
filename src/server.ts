@@ -1,7 +1,11 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
-import { prisma } from './services/prisma'
+import { poolRoutes } from './routes/pool.routes'
+import { userRoutes } from './routes/user.routes'
+import { gameRoutes } from './routes/game.routes'
+import { guessRoutes } from './routes/guess.routes'
+import { authRoutes } from './routes/auth.routes'
 
 const bootstrap = async () => {
   const PORT = 3333 || process.env.PORT
@@ -13,11 +17,11 @@ const bootstrap = async () => {
     origin: true
   })
 
-  fastify.get('/pools/count', async (req, res) => {
-    const count = await prisma.pool.count()
-
-    return { count }
-  })
+  await fastify.register(poolRoutes)
+  await fastify.register(userRoutes)
+  await fastify.register(gameRoutes)
+  await fastify.register(guessRoutes)
+  await fastify.register(authRoutes)
 
   await fastify.listen({
     port: PORT,
