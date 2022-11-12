@@ -1,9 +1,9 @@
-import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify'
-import { prisma } from '../services/prisma'
+import { FastifyInstance } from 'fastify'
+
+import { UserController } from './../controllers/UserController'
+
+const userController = new UserController()
 
 export const userRoutes = async (fastify: FastifyInstance) => {
-  fastify.get('/users/count', async (request: FastifyRequest, response: FastifyReply) => {
-    const count = await prisma.user.count()
-    response.status(201).send({ count })
-  })
+  fastify.get('/users/count', userController.index)
 }
