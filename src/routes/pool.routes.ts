@@ -1,26 +1,16 @@
-import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify'
-import ShortUniqueId from 'short-unique-id'
+import { FastifyInstance } from 'fastify'
+import { authenticate } from '../plugins/authenticate'
 
-import { prisma } from '../services/prisma'
-import { createPoolBody } from '../validations/poolValidation'
+import { PoolController } from './../controllers/PoolController'
+import { PoolShowController } from './../controllers/PoolShowController'
+
+const poolController = new PoolController()
+const poolShowController = new PoolShowController()
 
 export const poolRoutes = async (fastify: FastifyInstance) => {
-  fastify.get('/pools/count', async (request: FastifyRequest, response: FastifyReply) => {
-    const count = await prisma.pool.count()
-    response.status(201).send({ count })
-  })
-
-  fastify.post('/pools', async (request: FastifyRequest, response: FastifyReply) => {
-    const { title } = createPoolBody.parse(request.body)
-    const generate = new ShortUniqueId({ length: 6 })
-    const code = String(generate()).toUpperCase()
-    await prisma.pool.create({
-      data: {
-        title,
-        code
-      }
-    })
-
-    return response.status(201).send({ code })
-  })
+  fastify.get('/pools/count', poolController.index)
+  fastify.post('/pools', poolController.store)
+  fastify.post('/pools/join', { onRequest: [authenticate] }, poolController.create)
+  fastify.get('/pools', { onRequest: [authenticate] }, poolShowController.index)
+  fastify.get('/pools/:id', { onRequest: [authenticate] }, poolShowController.show)
 }
